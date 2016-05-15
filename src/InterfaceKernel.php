@@ -82,8 +82,10 @@ class InterfaceKernel
 
         $this->objects[] = new Address($this->log, $this->ipWrapper, $this->config['primary-ip'], $this->name);
 
-        foreach ($this->config['secondary-ips'] as $ip) {
-            $this->objects[] = new Address($this->log, $this->ipWrapper, $ip, $this->name);
+        if (isset($this->config['secondary-ips'])) {
+            foreach ($this->config['secondary-ips'] as $ip) {
+                $this->objects[] = new Address($this->log, $this->ipWrapper, $ip, $this->name);
+            }
         }
 
         $this->objects[] = new Route($this->log, $this->ipWrapper, $this->config['primary-ip'], null, $this->name);
@@ -216,8 +218,8 @@ class InterfaceKernel
             $this->objects[] = new Route($this->log, $this->ipWrapper, $config['primary-ip'], null, $this->name);
         }
         
-        $currentIps = array_merge([$this->config['primary-ip']], $this->config['secondary-ips']);
-        $newIps     = array_merge([$config['primary-ip']], $config['secondary-ips']);
+        $currentIps = array_merge([$this->config['primary-ip']], isset($this->config['secondary-ips']) ? $this->config['secondary-ips'] : []);
+        $newIps     = array_merge([$config['primary-ip']], isset($config['secondary-ips']) ? $config['secondary-ips'] : []);
 
         $toRemove = array_diff($currentIps, $newIps);
         $toAdd    = array_diff($newIps, $currentIps);
