@@ -1,0 +1,19 @@
+{
+  "name": "eater/static-x",
+  "description": "An static IP manager written in PHP",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Corne Oppelaar",
+      "email": "hello@eaterofco.de"
+    }
+  ],
+  "autoload": {
+    "psr-4":{"Eater\\StaticX\\": "src/"}
+  },
+  "require": {
+    "mustangostang/spyc": "^0.5.1",
+    "monolog/monolog": "^1.19"
+  }
+}
