@@ -45,6 +45,8 @@ class InterfaceKernel
      */
     private $hadLinkPreviously = null;
 
+    private $flashOnBoot = false;
+
     /**
      * @return string
      */
@@ -60,12 +62,13 @@ class InterfaceKernel
      * @param string $name
      * @param array $config
      */
-    public function __construct($log, $ipWrapper, $name, $config)
+    public function __construct($log, $ipWrapper, $name, $config, $flashOnBoot)
     {
         $this->log = $log;
         $this->ipWrapper = $ipWrapper;
         $this->name = $name;
         $this->config = $config;
+        $this->flashOnBoot = $flashOnBoot;
     }
 
     /**
@@ -115,6 +118,13 @@ class InterfaceKernel
 
             $this->log->addInfo(($hasLink ? "Found" : "Missing") . " link '{$this->name}'");
             $this->hadLinkPreviously = $hasLink;
+
+            if ($hasLink) {
+                $this->log->addInfo("Flushing '{$this->name}'");
+                if (!$dryRun) {
+                    $this->ipWrapper->flush($this->name);
+                }
+            }
         }
 
         if (!$hasLink) {

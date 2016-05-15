@@ -64,9 +64,19 @@ class Kernel
     private $gotStopSignal = false;
 
     /**
+     * @var boolean
+     */
+    private $flushOnBoot = false;
+
+    /**
      * @var InterfaceKernel[]
      */
     private $interfaceKernelsToRevert = [];
+
+    /**
+     * @var InterfaceKernel[]
+     */
+    private $interfaceKernelsToFlush = [];
 
     public function boot()
     {
@@ -94,6 +104,10 @@ class Kernel
 
     private function startMainLoop() {
         do {
+
+            while ($interfaceKernel = array_shift($this->interfaceKernelsToFlush)) {
+                $interfaceKernel->flush($this->dryRun);
+            }
 
             while ($interfaceKernel = array_shift($this->interfaceKernelsToRevert)) {
                 $interfaceKernel->revert($this->dryRun);
@@ -151,7 +165,7 @@ class Kernel
             $config = $this->cliConfig;
         }
 
-        $this->interfaceKernels[$interface] = new InterfaceKernel($this->log, $this->getIpWrapper(), $interface, $config);
+        $this->interfaceKernels[$interface] = new InterfaceKernel($this->log, $this->getIpWrapper(), $interface, $config, $this->flushOnBoot);
     }
 
     /**
@@ -174,7 +188,7 @@ class Kernel
 
     private function attachSignalHandlers()
     {
-        $success = pcntl_signal(SIGHUP, function ($sig) {
+        $success = pcntl_signal(SIGHUP, function () {
             $this->log->addInfo('Got HUP signal reloading');
             $this->reload();
         });
@@ -183,7 +197,7 @@ class Kernel
             $this->log->addCritical("Attaching SIGHUP trap failed");
         }
         
-        pcntl_signal(SIGINT, function ($sig) {
+        pcntl_signal(SIGINT, function () {
             $this->log->addInfo('Got INT signal starting shutdown');
             $this->shutdown();
         });
@@ -192,7 +206,7 @@ class Kernel
             $this->log->addCritical("Attaching SIGINT trap failed");
         }
 
-        pcntl_signal(SIGTERM, function ($sig) {
+        pcntl_signal(SIGTERM, function () {
             $this->log->addInfo('Got TERM signal starting shutdown');
             $this->shutdown();
         });
@@ -247,7 +261,7 @@ class Kernel
 
         $newKernels = [];
         foreach ($interfacesToAdd as $interface) {
-            $newKernels[] = new InterfaceKernel($this->log, $this->ipWrapper, $interface, $config['interfaces'][$interface]);
+            $newKernels[] = new InterfaceKernel($this->log, $this->ipWrapper, $interface, $config['interfaces'][$interface], $this->flushOnBoot);
         }
         
         $success = $this->bootInterfaces($newKernels);
@@ -261,7 +275,7 @@ class Kernel
         }
 
         foreach ($interfacesToRemove as $interface) {
-            $this->scheduleRevert($this->interfaceKernels);
+            $this->scheduleRevert($this->interfaceKernels[$interface]);
             unset($this->interfaceKernels[$interface]);
         }
 
@@ -272,6 +286,10 @@ class Kernel
     }
 
     private function scheduleRevert($interfaceKernel) {
+        if ($this->keepOnExit) {
+            return;
+        }
+
         $this->interfaceKernelsToRevert[] = $interfaceKernel;
     }
 
@@ -290,11 +308,12 @@ class Kernel
     private function parseOptions()
     {
         $options = getopt(
-            "c:i:l:Xa:r:cA:n",
+            "c:i:l:Xa:r:cA:nf",
             [
                 'noop',
                 'dryrun',
                 'no-config',
+                'flush',
                 'keep-on-exit',
                 'default',
                 'log:',
@@ -353,6 +372,12 @@ class Kernel
             case 'noop':
             case 'dryrun':
                 $this->dryRun = true;
+                break;
+            case 'f':
+            case 'flush':
+                $this->flushOnBoot = true;
+                break;
+
         }
     }
 

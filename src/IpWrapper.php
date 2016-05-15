@@ -212,6 +212,11 @@ class IpWrapper
         $this->execute('ip route del ' . $address . ' ' . $command);
     }
 
+    public function flush($dev)
+    {
+        $this->execute('ip addr flush dev ' . escapeshellarg($dev));
+    }
+
     /**
      * @param string $command
      * @return bool

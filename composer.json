@@ -1,5 +1,6 @@
 {
   "name": "eater/static-x",
+  "version": "1.0.0",
   "description": "An static IP manager written in PHP",
   "minimum-stability": "stable",
   "license": "MIT",
