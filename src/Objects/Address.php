@@ -68,7 +68,7 @@ class Address implements Object
         if (!in_array($this->address, $addresses) && !$this->virtuallyApplied) {
             $this->log->addInfo("Adding address '{$this->address}' to '{$this->dev}'");
             if (!$dryRun) {
-                $this->ipWrapper->addAddress($dryRun, $this->address, $this->dev);
+                $this->ipWrapper->addAddress($this->address, $this->dev);
             } else {
                 $this->virtuallyApplied = true;
             }
