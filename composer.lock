@@ -4,9 +4,52 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0340fe8f7a5b283b7786b8493ae52fa1",
-    "content-hash": "4c77b977fa07507bcc8c65e070d912bd",
+    "hash": "f647a9760783f9e82e5e0d3d18d091fe",
+    "content-hash": "4af4b9342f61a54fb7d2c0d948b9b58f",
     "packages": [
+        {
+            "name": "lifo/ip",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lifo101/ip.git",
+                "reference": "3597b6f649333be6d0f44d4344d8c05341c006fb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lifo101/ip/zipball/3597b6f649333be6d0f44d4344d8c05341c006fb",
+                "reference": "3597b6f649333be6d0f44d4344d8c05341c006fb",
+                "shasum": ""
+            },
+            "require": {
+                "ext-bcmath": "*",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Lifo\\IP\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jason Morriss",
+                    "email": "lifo2013@gmail.com"
+                }
+            ],
+            "description": "IP address helper PHP library for working with IPv4 and IPv6 addresses",
+            "keywords": [
+                "IP",
+                "ip address",
+                "ipv4",
+                "ipv6"
+            ],
+            "time": "2014-05-05 12:58:15"
+        },
         {
             "name": "monolog/monolog",
             "version": "1.19.0",
@@ -173,9 +216,11 @@
     ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": [],
-    "prefer-stable": false,
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "lifo/ip": 20
+    },
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": []

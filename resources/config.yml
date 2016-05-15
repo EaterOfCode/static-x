@@ -1,4 +1,4 @@
 interfaces:
   bs:
-    primary-ip: 127.0.1.2
+    primary-ip: 127.0.1.2/8
     default-route: 127.12.2.1

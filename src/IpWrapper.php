@@ -9,6 +9,7 @@
 namespace Eater\StaticX;
 
 
+use Lifo\IP\CIDR;
 use Monolog\Logger;
 
 class IpWrapper
@@ -141,12 +142,11 @@ class IpWrapper
             'address' => array_shift($parts)
         ];
 
-
         if (count($parts) === 0) {
             return false;
         }
 
-        while (in_array($parts[0], ['via', 'dev'])) {
+        while (in_array(reset($parts), ['via', 'dev'])) {
             $item = array_shift($parts);
             $route[$item] = array_shift($parts);
         }
@@ -240,5 +240,23 @@ class IpWrapper
         }
 
         return $output;
+    }
+
+    /**
+     * @param string $cidr
+     * @return string
+     */
+    public function getLowestIpInCidr($cidr) {
+        $ip = CIDR::cidr_to_range($cidr)[0];
+
+        $parts = explode("/", $cidr);
+
+        if (!isset($parts[1])) {
+            $ip .= '/' . (strpos($ip, ':') === false  ? 32 : 128);
+        } else {
+            $ip .= '/' . $parts[1];
+        }
+
+        return $ip;
     }
 }

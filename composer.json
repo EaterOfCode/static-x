@@ -2,7 +2,8 @@
   "name": "eater/static-x",
   "version": "1.0.0",
   "description": "An static IP manager written in PHP",
-  "minimum-stability": "stable",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "license": "MIT",
   "authors": [
     {
@@ -15,6 +16,7 @@
   },
   "require": {
     "mustangostang/spyc": "^0.5.1",
-    "monolog/monolog": "^1.19"
+    "monolog/monolog": "^1.19",
+    "lifo/ip": "dev-master"
   }
 }

@@ -6,6 +6,7 @@ namespace Eater\StaticX;
 use Eater\StaticX\Objects\Address;
 use Eater\StaticX\Objects\DefaultRoute;
 use Eater\StaticX\Objects\Route;
+use Lifo\IP\CIDR;
 use Monolog\Logger;
 
 class InterfaceKernel
@@ -88,7 +89,7 @@ class InterfaceKernel
             }
         }
 
-        $this->objects[] = new Route($this->log, $this->ipWrapper, $this->config['primary-ip'], null, $this->name);
+        $this->objects[] = new Route($this->log, $this->ipWrapper, $this->ipWrapper->getLowestIpInCidr($this->config['primary-ip']), null, $this->name);
 
         if (isset($this->config['default-route'])) {
             $this->objects[] = new DefaultRoute($this->log, $this->ipWrapper, $this->config['default-route']);
@@ -215,7 +216,7 @@ class InterfaceKernel
                 }
             }
 
-            $this->objects[] = new Route($this->log, $this->ipWrapper, $config['primary-ip'], null, $this->name);
+            $this->objects[] = new Route($this->log, $this->ipWrapper, $this->ipWrapper->getLowestIpInCidrWithRange($config['primary-ip']), null, $this->name);
         }
         
         $currentIps = array_merge([$this->config['primary-ip']], isset($this->config['secondary-ips']) ? $this->config['secondary-ips'] : []);
