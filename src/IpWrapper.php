@@ -55,15 +55,7 @@ class IpWrapper
      * @throws \Exception
      */
     public function getRoutesLike($address, $via, $dev) {
-
-        $command = "";
-        if ($via !== null) {
-            $command = 'via ' . escapeshellarg($via);
-        } elseif ($dev) {
-            $command = 'dev ' . escapeshellarg($dev);
-        }
-
-        $data = $this->execute('ip route show ' . $command);
+        $data = $this->execute('ip route show');
 
         $routes = [];
         foreach ($data as $route) {
@@ -160,7 +152,7 @@ class IpWrapper
      * @throws \Exception
      */
     public function addAddress($address, $dev) {
-        $this->execute('ip addr add ' . escapeshellarg($address) . ' dev ' . escapeshellarg($dev));
+        $this->execute('ip addr add ' . escapeshellarg($address) . ' dev ' . escapeshellarg($dev) . ' 2>&1');
     }
 
     /**
@@ -169,7 +161,7 @@ class IpWrapper
      * @throws \Exception
      */
     public function removeAddress($address, $dev) {
-        $this->execute('ip addr del ' . escapeshellarg($address) . ' dev ' . escapeshellarg($dev));
+        $this->execute('ip addr del ' . escapeshellarg($address) . ' dev ' . escapeshellarg($dev) . ' 2>&1');
     }
 
     /**
@@ -189,7 +181,7 @@ class IpWrapper
             $command .= 'dev ' . escapeshellarg($dev);
         }
 
-        $this->execute('ip route add ' . $address . ' ' . $command);
+        $this->execute('ip route add ' . escapeshellarg($address) . ' ' . $command . ' 2>&1');
     }
 
     /**
@@ -209,12 +201,12 @@ class IpWrapper
             $command .= 'dev ' . escapeshellarg($dev);
         }
 
-        $this->execute('ip route del ' . $address . ' ' . $command);
+        $this->execute('ip route del ' . escapeshellarg($address) . ' ' . $command. ' 2>&1');
     }
 
     public function flush($dev)
     {
-        $this->execute('ip addr flush dev ' . escapeshellarg($dev));
+        $this->execute('ip addr flush dev ' . escapeshellarg($dev) . ' 2>&1');
     }
 
     /**
@@ -258,5 +250,9 @@ class IpWrapper
         }
 
         return $ip;
+    }
+
+    public function bringUpLink($dev) {
+        $this->execute('ip link set ' . escapeshellarg($dev) . ' up 2>&1');
     }
 }

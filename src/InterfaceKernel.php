@@ -6,7 +6,6 @@ namespace Eater\StaticX;
 use Eater\StaticX\Objects\Address;
 use Eater\StaticX\Objects\DefaultRoute;
 use Eater\StaticX\Objects\Route;
-use Lifo\IP\CIDR;
 use Monolog\Logger;
 
 class InterfaceKernel
@@ -46,7 +45,10 @@ class InterfaceKernel
      */
     private $hadLinkPreviously = null;
 
-    private $flashOnBoot = false;
+    /**
+     * @var boolean
+     */
+    private $flushOnBoot = false;
 
     /**
      * @return string
@@ -62,6 +64,7 @@ class InterfaceKernel
      * @param IpWrapper $ipWrapper
      * @param string $name
      * @param array $config
+     * @param boolean $flashOnBoot
      */
     public function __construct($log, $ipWrapper, $name, $config, $flashOnBoot)
     {
@@ -69,7 +72,7 @@ class InterfaceKernel
         $this->ipWrapper = $ipWrapper;
         $this->name = $name;
         $this->config = $config;
-        $this->flashOnBoot = $flashOnBoot;
+        $this->flushOnBoot = $flashOnBoot;
     }
 
     /**
@@ -123,9 +126,26 @@ class InterfaceKernel
             $this->hadLinkPreviously = $hasLink;
 
             if ($hasLink) {
-                $this->log->addInfo("Flushing '{$this->name}'");
+                $this->log->addInfo("Forcing '{$this->name}' up");
                 if (!$dryRun) {
-                    $this->ipWrapper->flush($this->name);
+                    try {
+                        $this->ipWrapper->bringUpLink($this->name);
+                    } catch (\Exception $e) {
+                        $this->log->addCritical("Failed getting '{$this->name}' up");
+                        return false;
+                    }
+                }
+
+                if ($this->flushOnBoot) {
+                    $this->log->addInfo("Flushing '{$this->name}'");
+                    if (!$dryRun) {
+                        try {
+                        $this->ipWrapper->flush($this->name);
+                        } catch (\Exception $e) {
+                            $this->log->addCritical("Failed flushing '{$this->name} up");
+                            return false;
+                        }
+                    }
                 }
             }
         }
@@ -216,7 +236,7 @@ class InterfaceKernel
                 }
             }
 
-            $this->objects[] = new Route($this->log, $this->ipWrapper, $this->ipWrapper->getLowestIpInCidrWithRange($config['primary-ip']), null, $this->name);
+            $this->objects[] = new Route($this->log, $this->ipWrapper, $this->ipWrapper->getLowestIpInCidr($config['primary-ip']), null, $this->name);
         }
         
         $currentIps = array_merge([$this->config['primary-ip']], isset($this->config['secondary-ips']) ? $this->config['secondary-ips'] : []);
