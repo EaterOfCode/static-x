@@ -233,7 +233,7 @@ class InterfaceKernel
             $this->objects[] = new Address($this->log, $this->ipWrapper, $address, $this->name);
         }
 
-        $this->log->addInfo("Reloaded config for '{$this->name}', next cycle changes will be applied");
+        $this->log->addInfo("Reloaded config for '{$this->name}'");
         $this->config = $config;
     }
 
